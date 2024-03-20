@@ -79,3 +79,20 @@ nullish = false ?? "desna";
 nullish = undefined ?? "desna";
 
 console.log(nullish);
+
+
+/*  && ce vratiti prvu falsy vrijednost ili zadnju truthy vrijednost */
+
+let x; 
+
+x = 10 && 20 && 30;
+x = 10 && 20;
+x = 10 && 0 && 20;
+x = 10 && "" && 0 && 20;
+
+console.log(x);
+
+
+let lista = [];
+
+console.log(lista[0]); 

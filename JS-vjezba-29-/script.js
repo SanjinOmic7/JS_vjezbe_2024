@@ -6,17 +6,35 @@ const listaZadataka = document.getElementById("zadatak-list");
 const filter = document.getElementById("filter");
 const brisiSve = document.getElementById("clear");
 
+// Funkcija za povlačenje zadatka iz lokalnog spremišta
+
+const prikaziZadatkeLS = () => {
+  const zadaciSpremiste = dohvatiLocalStorage();
+  zadaciSpremiste.forEach((zadatak) => kreirajZadatak(zadatak));
+  provjeriListu();
+};
+
 // Funkcija za kreiranje novog zadatka
 const dodajZadatak = (e) => {
   e.preventDefault();
 
-  if (zadatakInput.value === "") {
+  const noviZadatak = zadatakInput.value.trim();
+
+  if (noviZadatak === "") {
     alert("Molimo vas unesite zadatak");
     return;
+  } else {
+    kreirajZadatak(noviZadatak);
+    provjeriListu();
+    dodajLocalStorage(noviZadatak);
+    zadatakInput.value = "";
   }
+};
 
+// Funkcija za kreiranje zadatka
+const kreirajZadatak = (noviZadatak) => {
   const li = document.createElement("li");
-  li.appendChild(document.createTextNode(zadatakInput.value));
+  li.appendChild(document.createTextNode(noviZadatak));
 
   const delGumb = document.createElement("button");
   delGumb.className = "ukloni-zadatak btn-link";
@@ -27,23 +45,54 @@ const dodajZadatak = (e) => {
   delGumb.appendChild(ikona);
   li.appendChild(delGumb);
   listaZadataka.appendChild(li);
+};
 
-  provjeriListu();
+// Funkcija za dodavanje zadatak u localStorage.
 
-  zadatakInput.value = "";
+const dodajLocalStorage = (zadatakInput) => {
+  const zadaciSpremiste = dohvatiLocalStorage();
+  zadaciSpremiste.push(zadatakInput);
+  localStorage.setItem("kljuc", JSON.stringify(zadaciSpremiste));
+};
+
+// Funkcija za dohvaćanje podataka iz LocalStoragea
+const dohvatiLocalStorage = () => {
+  let zadaciSpremiste;
+
+  if (localStorage.getItem("kljuc") === null) {
+    zadaciSpremiste = [];
+  } else {
+    zadaciSpremiste = JSON.parse(localStorage.getItem("kljuc"));
+  }
+
+  return zadaciSpremiste;
 };
 
 // funkcija za brisanje pojedinačnog zadatka
 const obrisiZadatak = (e) => {
   if (e.target.parentElement.classList.contains("ukloni-zadatak")) {
-    e.target.parentElement.parentElement.remove();
+    ukloniZadatak(e.target.parentElement.parentElement);
   }
+};
+
+// funkcija koja briše zadatak vizualno sa DOM-a i također prosljeđuje kao parametar podatak prema funkciji obrisiIzDOM-a zadatak koji brišemo.
+const ukloniZadatak = (zadatakIzDOM) => {
+  zadatakIzDOM.remove();
+  obrisiIzDOM(zadatakIzDOM.textContent);
   provjeriListu();
+};
+
+// Funkcija koja će dohvatiti zadatke iz LS-a i filter metodom obrisati kliknutog i nakon toga spremiti sve nazad u LS bez kliknutog zadatka.
+const obrisiIzDOM = (e) => {
+  let zadatakIzStoragea = dohvatiLocalStorage();
+  zadatakIzStoragea = zadatakIzStoragea.filter((zadatak) => zadatak !== e);
+  localStorage.setItem("kljuc", JSON.stringify(zadatakIzStoragea));
 };
 
 // funkcija za brisanje svih zadataka
 const obrisiZadatke = () => {
   listaZadataka.innerHTML = "";
+  localStorage.removeItem("kljuc");
   provjeriListu();
 };
 
@@ -79,4 +128,5 @@ forma.addEventListener("submit", dodajZadatak);
 listaZadataka.addEventListener("click", obrisiZadatak);
 brisiSve.addEventListener("click", obrisiZadatke);
 filter.addEventListener("input", filtrirajZadatke);
+document.addEventListener("DOMContentLoaded", prikaziZadatkeLS);
 provjeriListu();

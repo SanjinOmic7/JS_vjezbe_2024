@@ -31,7 +31,7 @@
 
 //primjer do-while, while-do
 
-const count = 0;
+/* const count = 0;
 while (count < 10) {
     console.log(count);
     count++;
@@ -58,4 +58,5 @@ while (broj <= 20) {
     console.log(broj);
   }
   broj++;
-}
+} */
+
